@@ -156,7 +156,7 @@ export function LoadingOverlay({
 
         {/* 3. Center Glowing Ring & 4. Title Text */}
         <div 
-          className="flex-1 flex flex-col items-center justify-center relative z-20 px-4 mt-[-40px] transition-all duration-300 ease-out"
+          className="flex-1 flex flex-col items-center justify-center relative z-20 px-4 mt-8 transition-all duration-300 ease-out"
           style={{
             transform: `translateY(${-expandProgress * 150}px) scale(${1 - expandProgress * 0.25})`,
             opacity: 1 - expandProgress,

@@ -29,6 +29,7 @@ export interface Message {
   text: string
   timestamp: string
   isOwn: boolean
+  isSent?: boolean
 }
 
 export interface Chat {
@@ -45,11 +46,21 @@ export interface Chat {
   notes: string
 }
 
-export interface ChatListItem {
-  id: string
-  name: string
-  initials: string
-  color: string
-  lastMessage: string
-  timestamp: string
+export interface DummyUser {
+  id: number
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  image: string
+  username: string
 }
+
+export interface ApiResponse<T> {
+  users: T[]
+  total: number
+  skip: number
+  limit: number
+}
+
+export type LoadingState = 'idle' | 'selecting' | 'loading' | 'skeleton' | 'flying' | 'populating' | 'ready'

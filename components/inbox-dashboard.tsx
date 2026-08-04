@@ -26,6 +26,7 @@ export function InboxDashboard() {
   
   // State Machine for loading sequence
   const [loadingState, setLoadingState] = useState<LoadingState>('loading')
+  const [expandProgress, setExpandProgress] = useState(0)
   const [visibleColumns, setVisibleColumns] = useState(0)
   const [error, setError] = useState<Error | null>(null)
   
@@ -59,6 +60,62 @@ export function InboxDashboard() {
   useEffect(() => {
     loadData()
   }, [])
+
+  // Handle wheel scrolling and touch swipe events to expand the dashboard
+  useEffect(() => {
+    if (loadingState !== 'loaded') {
+      setExpandProgress(0)
+      return
+    }
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY > 0) {
+        setExpandProgress((prev) => {
+          const next = Math.min(1, prev + e.deltaY * 0.0018)
+          if (next >= 0.98) {
+            setLoadingState('skeleton')
+            return 1
+          }
+          return next
+        })
+      } else if (e.deltaY < 0) {
+        setExpandProgress((prev) => Math.max(0, prev + e.deltaY * 0.0018))
+      }
+    }
+
+    let startY = 0
+    const handleTouchStart = (e: TouchEvent) => {
+      startY = e.touches[0]?.clientY ?? 0
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const currentY = e.touches[0]?.clientY ?? 0
+      const delta = startY - currentY
+      if (delta > 0) {
+        setExpandProgress((prev) => {
+          const next = Math.min(1, prev + delta * 0.004)
+          if (next >= 0.98) {
+            setLoadingState('skeleton')
+            return 1
+          }
+          return next
+        })
+      } else if (delta < 0) {
+        setExpandProgress((prev) => Math.max(0, prev + delta * 0.004))
+      }
+      startY = currentY
+    }
+
+    window.addEventListener('wheel', handleWheel, { passive: true })
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
+    window.addEventListener('touchmove', handleTouchMove, { passive: true })
+
+    return () => {
+      window.removeEventListener('wheel', handleWheel)
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchmove', handleTouchMove)
+    }
+  }, [loadingState])
 
   // Handle active loading states:
   // When entering 'skeleton' state, wait for skeletonDelay, then transition to 'flying'
@@ -205,6 +262,7 @@ export function InboxDashboard() {
             chats={chats}
             selectedChatId={selectedChatId}
             onExpand={() => setLoadingState('skeleton')}
+            expandProgress={expandProgress}
           />
         )}
       </AnimatePresence>

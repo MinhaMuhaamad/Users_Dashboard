@@ -63,4 +63,4 @@ export interface ApiResponse<T> {
   limit: number
 }
 
-export type LoadingState = 'idle' | 'selecting' | 'loading' | 'skeleton' | 'flying' | 'populating' | 'ready'
+export type LoadingState = 'idle' | 'selecting' | 'loading' | 'loaded' | 'skeleton' | 'flying' | 'populating' | 'ready'

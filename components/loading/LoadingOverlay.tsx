@@ -2,10 +2,20 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { Mail, Sparkles, Users, GitBranch, Target, ShieldAlert } from 'lucide-react'
 import { SkeletonDashboard } from './SkeletonDashboard'
+import { TopNav } from '../layout/TopNav'
+import { InboxSidebar } from '../inbox/InboxSidebar'
+import { ConversationList } from '../inbox/ConversationList'
+import { ChatThread } from '../inbox/ChatThread'
+import { DetailsPanel } from '../inbox/DetailsPanel'
+import { Chat } from '@/lib/types'
 
 interface LoadingOverlayProps {
   activeTab: string
   error: Error | null
+  isLoading: boolean
+  chats: Chat[]
+  selectedChatId: string | null
+  onExpand: () => void
 }
 
 interface HexagonTileProps {
@@ -18,7 +28,6 @@ interface HexagonTileProps {
   delay: number
 }
 
-// Custom flat-top hexagon with rounded corners using an optimized SVG path
 function HexagonTile({
   icon: Icon,
   left,
@@ -41,7 +50,6 @@ function HexagonTile({
         height: '88px',
       }}
     >
-      {/* Hexagon base */}
       <svg
         viewBox="0 0 100 115"
         className={`w-full h-full drop-shadow-md transition-all duration-300 ${
@@ -58,7 +66,6 @@ function HexagonTile({
         />
       </svg>
 
-      {/* Centered Icon */}
       <div 
         className="absolute inset-0 flex items-center justify-center text-white"
         style={{ opacity: iconOpacity }}
@@ -69,7 +76,14 @@ function HexagonTile({
   )
 }
 
-export function LoadingOverlay({ activeTab, error }: LoadingOverlayProps) {
+export function LoadingOverlay({
+  activeTab,
+  error,
+  isLoading,
+  chats,
+  selectedChatId,
+  onExpand
+}: LoadingOverlayProps) {
   // Translate tab ID to user-friendly label
   const getTabLabel = (id: string) => {
     switch (id) {
@@ -82,6 +96,9 @@ export function LoadingOverlay({ activeTab, error }: LoadingOverlayProps) {
     }
   }
 
+  const selectedChat = chats.find(c => c.id === selectedChatId) || chats[0] || null
+  const dummyUser = { name: 'Michael Johnson', initials: 'MJ' }
+
   return (
     <motion.div
       initial={{ opacity: 1 }}
@@ -89,7 +106,6 @@ export function LoadingOverlay({ activeTab, error }: LoadingOverlayProps) {
       transition={{ duration: 0.6, ease: 'easeInOut' }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-[#070B14] text-white overflow-hidden"
     >
-      {/* 1. Canvas frame (1440x869 or full screen layout with soft border & corner mask) */}
       <div 
         className="relative w-full h-full max-w-[1440px] max-h-[869px] rounded-3xl border border-white/5 overflow-hidden flex flex-col justify-between"
         style={{
@@ -100,74 +116,22 @@ export function LoadingOverlay({ activeTab, error }: LoadingOverlayProps) {
           boxShadow: 'inset 0 0 40px rgba(0, 0, 0, 0.8), 0 25px 50px -12px rgba(0, 0, 0, 0.5)',
         }}
       >
-        {/* Faint thin diagonal light streak in lower-left area */}
         <div 
           className="absolute bottom-0 left-0 w-[20%] h-[15%] bg-gradient-to-tr from-cyan-500/5 to-transparent skew-x-12 blur-sm pointer-events-none"
           style={{ transform: 'rotate(15deg) translate(-20px, 30px)' }}
         />
 
-        {/* 2. Scattered Hexagon tiles positioned absolutely via percentages */}
+        {/* Scattered Hexagons */}
         <div className="absolute inset-0 pointer-events-none z-10">
-          {/* Tile 1: Sparkles (AI) - (21%, 15%) */}
-          <HexagonTile 
-            icon={Sparkles} 
-            left="21%" 
-            top="15%" 
-            opacityClass="opacity-30" 
-            iconOpacity={0.4} 
-            delay={0.1}
-          />
-          {/* Tile 2: Inbox - (12.5%, 33%) */}
-          <HexagonTile 
-            icon={Mail} 
-            left="12.5%" 
-            top="33%" 
-            opacityClass="opacity-20" 
-            iconOpacity={0.4} 
-            delay={0.2}
-          />
-          {/* Tile 3: Contacts/People - (24%, 41%) */}
-          <HexagonTile 
-            icon={Users} 
-            left="24%" 
-            top="41%" 
-            opacityClass="opacity-25" 
-            iconOpacity={0.4} 
-            delay={0.3}
-          />
-          {/* Tile 4: Contacts (brighter, blue-tinted) - (88.5%, 15%) */}
-          <HexagonTile 
-            icon={Users} 
-            left="88.5%" 
-            top="15%" 
-            opacityClass="opacity-45" 
-            iconOpacity={0.5} 
-            blueTinted={true}
-            delay={0.15}
-          />
-          {/* Tile 5: Hierarchy/Workflow nodes - (74%, 27%) */}
-          <HexagonTile 
-            icon={GitBranch} 
-            left="74%" 
-            top="27%" 
-            opacityClass="opacity-35" 
-            iconOpacity={0.45} 
-            blueTinted={true}
-            delay={0.25}
-          />
-          {/* Tile 6: Target/Campaign - (86%, 42%) */}
-          <HexagonTile 
-            icon={Target} 
-            left="86%" 
-            top="42%" 
-            opacityClass="opacity-40" 
-            iconOpacity={0.45} 
-            blueTinted={true}
-            delay={0.35}
-          />
+          <HexagonTile icon={Sparkles} left="21%" top="15%" opacityClass="opacity-30" iconOpacity={0.4} delay={0.1} />
+          <HexagonTile icon={Mail} left="12.5%" top="33%" opacityClass="opacity-20" iconOpacity={0.4} delay={0.2} />
+          <HexagonTile icon={Users} left="24%" top="41%" opacityClass="opacity-25" iconOpacity={0.4} delay={0.3} />
+          <HexagonTile icon={Users} left="88.5%" top="15%" opacityClass="opacity-45" iconOpacity={0.5} blueTinted={true} delay={0.15} />
+          <HexagonTile icon={GitBranch} left="74%" top="27%" opacityClass="opacity-35" iconOpacity={0.45} blueTinted={true} delay={0.25} />
+          <HexagonTile icon={Target} left="86%" top="42%" opacityClass="opacity-40" iconOpacity={0.45} blueTinted={true} delay={0.35} />
         </div>
 
-        {/* 3. Center Glowing Ring + 4. Heading & Subtext */}
+        {/* Central Content */}
         <div className="flex-1 flex flex-col items-center justify-center relative z-20 px-4 mt-[-40px]">
           {error ? (
             <div className="flex flex-col items-center text-center max-w-md animate-in fade-in duration-300">
@@ -184,13 +148,8 @@ export function LoadingOverlay({ activeTab, error }: LoadingOverlayProps) {
             </div>
           ) : (
             <div className="flex flex-col items-center">
-              {/* Ring Container (Vertical ~25% of height) */}
               <div className="relative flex items-center justify-center" style={{ width: '210px', height: '210px' }}>
-                
-                {/* Glow ring outer shadow duplicate */}
                 <div className="absolute inset-[-15px] rounded-full bg-blue-500/10 blur-xl pointer-events-none" />
-
-                {/* Outer spinning glow ring with gradient stroke (crescent segment bottom-left) */}
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
@@ -201,8 +160,6 @@ export function LoadingOverlay({ activeTab, error }: LoadingOverlayProps) {
                     WebkitMaskImage: 'radial-gradient(circle, transparent 65%, black 66%)',
                   }}
                 />
-
-                {/* Center breathing core ring */}
                 <motion.div
                   animate={{ scale: [1, 1.03, 1] }}
                   transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
@@ -221,7 +178,6 @@ export function LoadingOverlay({ activeTab, error }: LoadingOverlayProps) {
                 </motion.div>
               </div>
 
-              {/* Status Header (Starting ~46% of frame height) */}
               <div className="mt-10 text-center flex flex-col items-center select-text">
                 <motion.h1
                   animate={{ opacity: [0.85, 1, 0.85] }}
@@ -229,7 +185,7 @@ export function LoadingOverlay({ activeTab, error }: LoadingOverlayProps) {
                   className="text-4xl font-extrabold text-white tracking-tight leading-none"
                   style={{ fontSize: '2.8rem' }}
                 >
-                  Extracting {getTabLabel(activeTab)} Info…
+                  {isLoading ? `Extracting ${getTabLabel(activeTab)} Info…` : `${getTabLabel(activeTab)} Synced`}
                 </motion.h1>
 
                 <motion.p
@@ -237,24 +193,66 @@ export function LoadingOverlay({ activeTab, error }: LoadingOverlayProps) {
                   transition={{ duration: 3, repeat: Infinity, delay: 0.3 }}
                   className="text-gray-400 text-sm mt-3 leading-relaxed max-w-[500px]"
                 >
-                  We are extracting information from the above honey combs to your system
+                  {isLoading 
+                    ? "We are extracting information from the above honey combs to your system" 
+                    : "Information extracted successfully. Click the card below to enter the dashboard."}
                 </motion.p>
               </div>
             </div>
           )}
         </div>
 
-        {/* 5. Bottom "Peeking" Dashboard Card (Starts at ~62% of height, inset ~7% on sides) */}
+        {/* 5. Bottom "Peeking" Dashboard Card (Clickable, triggers expand to full dashboard) */}
         <div 
-          className="mx-auto w-[86%] h-36 bg-white/75 rounded-t-[28px] border-t border-x border-white/10 shadow-[0_-20px_50px_rgba(0,0,0,0.6)] backdrop-blur-md overflow-hidden relative opacity-70 scale-98 origin-top select-none pointer-events-none"
+          onClick={(!isLoading && !error) ? onExpand : undefined}
+          className={`mx-auto w-[86%] rounded-t-[28px] border-t border-x shadow-[0_-20px_50px_rgba(0,0,0,0.6)] backdrop-blur-md overflow-hidden relative scale-98 origin-top select-none transition-all duration-500 ease-out ${
+            (isLoading || error) 
+              ? 'opacity-40 pointer-events-none cursor-not-allowed border-white/5 bg-white/20' 
+              : 'opacity-85 hover:opacity-100 cursor-pointer border-white/15 bg-white hover:scale-[0.99] active:scale-[0.985]'
+          }`}
+          style={{ height: '38%' }}
         >
-          {/* Subtle grab bar separator */}
-          <div className="w-10 h-1 bg-gray-400/40 rounded-full mx-auto mt-3.5 mb-2.5" />
+          {/* Grab bar */}
+          <div className="w-10 h-1 bg-gray-400/40 rounded-full mx-auto mt-3.5 mb-2.5 shrink-0" />
           
-          {/* Dimmed & blurred preview of skeleton layout */}
-          <div className="w-full h-full opacity-35 blur-[1.5px] scale-100 origin-top">
-            <SkeletonDashboard />
-          </div>
+          {isLoading ? (
+            /* Dimmed & blurred skeleton preview during load */
+            <div className="w-full h-full opacity-35 blur-[1.5px] scale-100 origin-top">
+              <SkeletonDashboard />
+            </div>
+          ) : (
+            /* Real populated dashboard preview with disabled pointer events once loaded */
+            <div className="w-full h-full opacity-85 blur-[0.4px] scale-100 origin-top flex flex-col bg-white pointer-events-none relative select-none">
+              <TopNav
+                activeTab={activeTab}
+                onTabSelect={() => {}}
+                currentUser={dummyUser}
+              />
+              <div className="flex flex-1 min-h-0 overflow-hidden bg-white">
+                <InboxSidebar chats={chats} selectedChatId={selectedChatId} />
+                <ConversationList
+                  chats={chats}
+                  selectedChatId={selectedChatId}
+                  onSelectChat={() => {}}
+                  isSidebarOpen={true}
+                  onToggleSidebar={() => {}}
+                />
+                <ChatThread
+                  chat={selectedChat}
+                  onSendMessage={() => {}}
+                  isDetailsOpen={true}
+                  onToggleDetails={() => {}}
+                />
+                <DetailsPanel
+                  chat={selectedChat}
+                  onClose={() => {}}
+                  onAddLabel={() => {}}
+                  onSaveNotes={() => {}}
+                />
+              </div>
+              <div className="absolute inset-0 bg-slate-900/5 pointer-events-none" />
+            </div>
+          )}
         </div>
 
       </div>

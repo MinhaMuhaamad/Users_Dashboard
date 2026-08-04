@@ -49,7 +49,7 @@ export function InboxDashboard() {
       const delay = bypassMinTimer ? 0 : Math.max(0, loadingConfig.minLoadingTime - elapsed)
       
       setTimeout(() => {
-        setLoadingState('skeleton')
+        setLoadingState('loaded')
       }, delay)
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Network error'))
@@ -197,8 +197,15 @@ export function InboxDashboard() {
       
       {/* Overlay Step 2 */}
       <AnimatePresence>
-        {loadingState === 'loading' && (
-          <LoadingOverlay activeTab={activeTab} error={error} />
+        {(loadingState === 'loading' || loadingState === 'loaded') && (
+          <LoadingOverlay
+            activeTab={activeTab}
+            error={error}
+            isLoading={loadingState === 'loading'}
+            chats={chats}
+            selectedChatId={selectedChatId}
+            onExpand={() => setLoadingState('skeleton')}
+          />
         )}
       </AnimatePresence>
 

@@ -53,16 +53,12 @@ function HexagonTile({
     >
       <svg
         viewBox="0 0 100 115"
-        className={`w-full h-full drop-shadow-md transition-all duration-300 ${
-          blueTinted 
-            ? 'text-blue-500/8 border-blue-400/10 shadow-[0_0_15px_rgba(59,130,246,0.1)]' 
-            : 'text-white/5 border-white/5'
-        }`}
+        className="w-full h-full drop-shadow-md"
       >
         <path
           d="M 28 5 L 72 5 Q 78 5 81 9 L 98 47 Q 100 52 98 57 L 81 95 Q 78 99 72 99 L 28 99 Q 22 99 19 95 L 2 57 Q 0 52 2 47 L 19 9 Q 22 5 28 5 Z"
-          fill={blueTinted ? 'rgba(30, 95, 176, 0.15)' : 'rgba(255, 255, 255, 0.05)'}
-          stroke={blueTinted ? 'rgba(96, 165, 250, 0.2)' : 'rgba(255, 255, 255, 0.08)'}
+          fill={blueTinted ? 'rgba(30, 58, 138, 0.15)' : 'rgba(255, 255, 255, 0.04)'}
+          stroke={blueTinted ? 'rgba(96, 165, 250, 0.15)' : 'rgba(255, 255, 255, 0.08)'}
           strokeWidth="2"
         />
       </svg>
@@ -89,11 +85,11 @@ export function LoadingOverlay({
   const selectedChat = chats.find(c => c.id === selectedChatId) || chats[0] || null
   const dummyUser = { name: 'Michael Johnson', initials: 'MJ' }
 
-  // Calculate drawer size transformations based on scroll/expand progress
-  const currentHeight = 38 + (expandProgress * 62) // grows from 38% to 100%
-  const currentWidth = 86 + (expandProgress * 14)  // grows from 86% to 100%
-  const currentOpacity = 0.85 + (expandProgress * 0.15) // from 85% to 100%
-  const currentBlur = 0.4 * (1 - expandProgress) // from 0.4px to 0px
+  // Drawer sizes & effects based on expand progress
+  const currentHeight = 38 + (expandProgress * 62)
+  const currentWidth = 86 + (expandProgress * 14)
+  const currentOpacity = 0.85 + (expandProgress * 0.15)
+  const currentBlur = 0.4 * (1 - expandProgress)
   const roundedCorners = expandProgress >= 0.95 ? 'rounded-t-none' : 'rounded-t-[28px]'
 
   return (
@@ -101,21 +97,40 @@ export function LoadingOverlay({
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.6, ease: 'easeInOut' }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#070B14] text-white overflow-hidden"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#030712] text-white overflow-hidden p-4 md:p-6"
     >
+      {/* 1. Canvas frame (1440x869 with 24px corners and subtle 1px border) */}
       <div 
-        className="relative w-full h-full max-w-[1440px] max-h-[869px] rounded-3xl border border-white/5 overflow-hidden flex flex-col justify-between"
+        className="relative w-full h-full max-w-[1440px] max-h-[869px] rounded-3xl border border-white/10 overflow-hidden flex flex-col justify-between"
         style={{
-          backgroundImage: `
-            radial-gradient(circle at 82% 45%, rgba(59, 130, 246, 0.5) 0%, rgba(30, 95, 176, 0.2) 30%, transparent 65%),
-            linear-gradient(135deg, #070B14 0%, #0A1020 30%, #0D1B3A 70%, #070B14 100%)
-          `,
-          boxShadow: 'inset 0 0 40px rgba(0, 0, 0, 0.8), 0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+          backgroundColor: '#040914',
+          boxShadow: 'inset 0 0 60px rgba(0, 0, 0, 0.9), 0 30px 60px -15px rgba(0, 0, 0, 0.8)',
         }}
       >
-        {/* Luminous blue glow vertical highlights representing light beams from reference image */}
-        <div className="absolute right-[5%] top-[10%] w-[30%] h-[80%] bg-gradient-to-b from-[#3b82f6] via-[#06b6d4] to-transparent opacity-25 blur-[100px] rounded-full pointer-events-none transform -skew-x-12" />
-        <div className="absolute right-[-10%] top-[20%] w-[35%] h-[60%] bg-[#00d2ff]/15 blur-[120px] rounded-full pointer-events-none" />
+        {/* 
+          LAYERED LUMINOUS LIGHTING EFFECTS 
+          Combines soft ambient backdrops with highly skewed, bright light bars to recreate the glow in the reference image.
+        */}
+
+        {/* A. Left-Bottom Cyan Glow */}
+        <div className="absolute left-[-8%] bottom-[-10%] w-[45%] h-[45%] bg-[#0891b2]/10 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute left-[5%] bottom-[5%] w-[25%] h-[30%] bg-[#0e7490]/15 blur-[85px] rounded-full pointer-events-none" />
+
+        {/* B. Center Soft Blue Ambient Backdrop */}
+        <div className="absolute left-[30%] top-[15%] w-[40%] h-[50%] bg-[#1d4ed8]/12 blur-[130px] rounded-full pointer-events-none" />
+
+        {/* C. Right Volumetric Light Beam */}
+        {/* Soft wide blue backdrop */}
+        <div className="absolute right-[-10%] top-[5%] w-[35%] h-[80%] bg-[#1e40af]/20 blur-[115px] rounded-full pointer-events-none" />
+        
+        {/* Skewed Blue Beam */}
+        <div className="absolute right-[12%] top-[-8%] w-[20%] h-[110%] bg-gradient-to-b from-[#3b82f6] via-[#1d4ed8] to-[#1e3a8a] blur-[75px] opacity-45 rounded-full -rotate-6 transform pointer-events-none" />
+        
+        {/* Neon Cyan Core Streak */}
+        <div className="absolute right-[17%] top-[5%] w-[8%] h-[85%] bg-gradient-to-b from-[#22d3ee] via-[#06b6d4] to-transparent blur-[48px] opacity-60 rounded-full -rotate-6 transform pointer-events-none" />
+        
+        {/* High-intensity White Highlight Center */}
+        <div className="absolute right-[19%] top-[20%] w-[3%] h-[40%] bg-white blur-[24px] opacity-40 rounded-full -rotate-6 transform pointer-events-none" />
 
         {/* Faint thin diagonal light streak in lower-left area */}
         <div 
@@ -177,7 +192,7 @@ export function LoadingOverlay({
                 <motion.div
                   animate={{ scale: [1, 1.03, 1] }}
                   transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-                  className="w-[196px] h-[196px] rounded-full bg-[#070B14]/90 border border-blue-500/20 flex items-center justify-center shadow-[inset_0_0_30px_rgba(37,99,235,0.3)]"
+                  className="w-[196px] h-[196px] rounded-full bg-[#040914]/95 border border-blue-500/25 flex items-center justify-center shadow-[inset_0_0_35px_rgba(37,99,235,0.35)]"
                 >
                   <motion.div
                     animate={{ opacity: [0.7, 1, 0.7] }}
@@ -192,7 +207,6 @@ export function LoadingOverlay({
                 </motion.div>
               </div>
 
-              {/* Spacing & text layout matching reference image */}
               <div className="mt-10 text-center flex flex-col items-center select-text">
                 <motion.h1
                   animate={{ opacity: [0.85, 1, 0.85] }}
@@ -215,7 +229,7 @@ export function LoadingOverlay({
           )}
         </div>
 
-        {/* 5. Bottom "Peeking" Dashboard Card (Clickable/Scrollable, scales and expands on delta progress) */}
+        {/* 5. Bottom "Peeking" Dashboard Card (Expandable Drawer) */}
         <div 
           onClick={(!isLoading && !error) ? onExpand : undefined}
           className={`mx-auto shadow-[0_-20px_50px_rgba(0,0,0,0.6)] backdrop-blur-md overflow-hidden relative origin-top select-none transition-all duration-350 ease-out ${roundedCorners} ${
@@ -229,16 +243,13 @@ export function LoadingOverlay({
             opacity: currentOpacity,
           }}
         >
-          {/* Subtle grab bar indicator */}
           <div className="w-10 h-1 bg-gray-400/40 rounded-full mx-auto mt-3.5 mb-2.5 shrink-0" />
           
           {isLoading ? (
-            /* Skeletons */
             <div className="w-full h-full opacity-35 blur-[1.5px] scale-100 origin-top">
               <SkeletonDashboard />
             </div>
           ) : (
-            /* Populated dashboard layout with scrolling opacity & blur transitions */
             <div 
               className="w-full h-full origin-top flex flex-col bg-white pointer-events-none relative select-none"
               style={{

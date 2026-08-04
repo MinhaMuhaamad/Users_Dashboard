@@ -87,7 +87,7 @@ export function DetailsPanel({ chat, onClose, onAddLabel, onSaveNotes }: Details
   }
 
   return (
-    <div className="w-[340px] border-l border-gray-200 bg-white flex flex-col h-full shrink-0 select-none overflow-y-auto">
+    <div className="w-full md:w-[340px] border-l border-gray-200 bg-white flex flex-col h-full shrink-0 select-none overflow-y-auto">
       {/* Header */}
       <div className="h-14 px-5 border-b border-gray-150 flex items-center justify-between shrink-0 bg-white">
         <h3 className="text-sm font-extrabold text-slate-900 leading-none">

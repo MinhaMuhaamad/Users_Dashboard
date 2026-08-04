@@ -1,5 +1,5 @@
 import React from 'react'
-import { User as UserIcon, Inbox, UserPlus, Users, MessageSquare } from 'lucide-react'
+import { User as UserIcon, Inbox, UserPlus, Users, MessageSquare, ArrowLeft } from 'lucide-react'
 import { Badge } from '../ui/Badge'
 import { CollapsibleSection } from './CollapsibleSection'
 import { Chat } from '@/lib/types'
@@ -7,9 +7,11 @@ import { Chat } from '@/lib/types'
 interface InboxSidebarProps {
   chats: Chat[]
   selectedChatId: string | null
+  isMobile?: boolean
+  onBack?: () => void
 }
 
-export function InboxSidebar({ chats, selectedChatId }: InboxSidebarProps) {
+export function InboxSidebar({ chats, selectedChatId, isMobile = false, onBack }: InboxSidebarProps) {
   // Hardcoded unread counts for specific names to match the prompt's requirements
   const getMockUnreadCount = (name: string): number | null => {
     if (name.includes('Sarah Williams')) return 2
@@ -37,9 +39,17 @@ export function InboxSidebar({ chats, selectedChatId }: InboxSidebarProps) {
   }
 
   return (
-    <div className="w-[260px] border-r border-gray-200 bg-white flex flex-col h-full shrink-0 select-none overflow-y-auto">
+    <div className="w-[260px] border-r border-gray-200 bg-white flex flex-col h-full shrink-0 select-none overflow-y-auto w-full md:w-[260px]">
       {/* Column Header */}
-      <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between shrink-0">
+      <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-3 shrink-0">
+        {isMobile && onBack && (
+          <button
+            onClick={onBack}
+            className="p-1 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-gray-800 transition-all active:scale-95"
+          >
+            <ArrowLeft size={16} />
+          </button>
+        )}
         <h2 id="inbox-header" className="text-base font-extrabold text-slate-900 tracking-tight">
           Inbox
         </h2>

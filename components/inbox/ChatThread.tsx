@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react'
-import { MoreVertical, Moon, PanelRightClose, PanelRight } from 'lucide-react'
+import { MoreVertical, Moon, PanelRightClose, PanelRight, ArrowLeft } from 'lucide-react'
 import { Chat, Message } from '@/lib/types'
 import { MessageBubble } from './MessageBubble'
 import { Composer } from './Composer'
@@ -10,6 +10,8 @@ interface ChatThreadProps {
   onSendMessage: (chatId: string, text: string) => void
   isDetailsOpen: boolean
   onToggleDetails: () => void
+  isMobile?: boolean
+  onBack?: () => void
 }
 
 export function ChatThread({
@@ -17,6 +19,8 @@ export function ChatThread({
   onSendMessage,
   isDetailsOpen,
   onToggleDetails,
+  isMobile = false,
+  onBack,
 }: ChatThreadProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -29,7 +33,15 @@ export function ChatThread({
 
   if (!chat) {
     return (
-      <div className="flex-1 bg-slate-50 flex flex-col items-center justify-center p-8 text-center select-none">
+      <div className="flex-1 bg-slate-50 flex flex-col items-center justify-center p-8 text-center select-none animate-fade-in">
+        {isMobile && onBack && (
+          <button
+            onClick={onBack}
+            className="absolute top-4 left-4 p-1.5 hover:bg-gray-150 rounded-lg text-gray-500 hover:text-gray-800 transition-all active:scale-95 flex items-center gap-1 text-xs font-bold"
+          >
+            <ArrowLeft size={16} /> Back to Inbox
+          </button>
+        )}
         <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-3 border border-slate-200/50">
           <svg viewBox="0 0 24 24" className="w-8 h-8 fill-none stroke-current" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -52,6 +64,14 @@ export function ChatThread({
       {/* Header */}
       <div className="h-14 px-6 border-b border-gray-150 bg-white flex items-center justify-between shrink-0 select-none z-10">
         <div className="flex items-center gap-3">
+          {isMobile && onBack && (
+            <button
+              onClick={onBack}
+              className="mr-1 p-1 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-gray-800 transition-all active:scale-95"
+            >
+              <ArrowLeft size={16} />
+            </button>
+          )}
           <h3 className="text-sm font-extrabold text-slate-900">
             {chat.user.name}
           </h3>

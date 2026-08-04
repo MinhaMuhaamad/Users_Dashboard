@@ -263,7 +263,9 @@ export function LoadingOverlay({
                 currentUser={dummyUser}
               />
               <div className="flex flex-1 min-h-0 overflow-hidden bg-white">
-                <InboxSidebar chats={chats} selectedChatId={selectedChatId} />
+                <div className="hidden md:block h-full shrink-0">
+                  <InboxSidebar chats={chats} selectedChatId={selectedChatId} />
+                </div>
                 <ConversationList
                   chats={chats}
                   selectedChatId={selectedChatId}
@@ -271,18 +273,20 @@ export function LoadingOverlay({
                   isSidebarOpen={true}
                   onToggleSidebar={() => {}}
                 />
-                <ChatThread
-                  chat={selectedChat}
-                  onSendMessage={() => {}}
-                  isDetailsOpen={true}
-                  onToggleDetails={() => {}}
-                />
-                <DetailsPanel
-                  chat={selectedChat}
-                  onClose={() => {}}
-                  onAddLabel={() => {}}
-                  onSaveNotes={() => {}}
-                />
+                <div className="hidden md:flex flex-1 min-h-0">
+                  <ChatThread
+                    chat={selectedChat}
+                    onSendMessage={() => {}}
+                    isDetailsOpen={true}
+                    onToggleDetails={() => {}}
+                  />
+                  <DetailsPanel
+                    chat={selectedChat}
+                    onClose={() => {}}
+                    onAddLabel={() => {}}
+                    onSaveNotes={() => {}}
+                  />
+                </div>
               </div>
               <div className="absolute inset-0 bg-slate-900/5 pointer-events-none" />
             </div>

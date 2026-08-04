@@ -62,7 +62,7 @@ export function ConversationList({
   }, [chats, searchQuery, statusFilter, sortOrder])
 
   return (
-    <div className="w-[480px] border-r border-gray-200 bg-white flex flex-col h-full shrink-0 select-none">
+    <div className="w-full md:w-[480px] border-r border-gray-200 bg-white flex flex-col h-full shrink-0 select-none">
       {/* Header */}
       <div className="h-14 px-4 border-b border-gray-150 flex items-center justify-between shrink-0 bg-white">
         <div className="flex items-center gap-3">

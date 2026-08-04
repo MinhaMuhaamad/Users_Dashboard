@@ -24,6 +24,19 @@ export function InboxDashboard() {
   const [isDetailsOpen, setIsDetailsOpen] = useState(true)
   const [activeTab, setActiveTab] = useState('inbox')
   
+  // Mobile Responsiveness States
+  const [isMobile, setIsMobile] = useState(false)
+  const [mobileView, setMobileView] = useState<'sidebar' | 'list' | 'chat' | 'details'>('list')
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+  
   // State Machine for loading sequence
   const [loadingState, setLoadingState] = useState<LoadingState>('loading')
   const [expandProgress, setExpandProgress] = useState(0)
@@ -168,12 +181,29 @@ export function InboxDashboard() {
     // Step 1: Selection State
     setActiveTab(tabId)
     setLoadingState('selecting')
+    setMobileView('list') // reset view on tab click
 
     setTimeout(() => {
       // Step 2: Overlay
       setLoadingState('loading')
       loadData(true)
     }, loadingConfig.selectionDelay)
+  }
+
+  // Responsive mobile routing handlers
+  const handleSelectChat = (chatId: string) => {
+    setSelectedChatId(chatId)
+    if (isMobile) {
+      setMobileView('chat')
+    }
+  }
+
+  const handleToggleSidebar = () => {
+    if (isMobile) {
+      setMobileView('sidebar')
+    } else {
+      setIsSidebarOpen(!isSidebarOpen)
+    }
   }
 
   // Active chat methods
@@ -294,41 +324,85 @@ export function InboxDashboard() {
         )}
 
         {/* Dashboard Columns */}
-        <div className="flex flex-1 min-h-0 bg-white">
-          {/* Column A */}
-          {isSidebarOpen && renderColumn(1, 
-            <InboxSidebar chats={chats} selectedChatId={selectedChatId} />
-          )}
+        <div className="flex flex-1 min-h-0 bg-white w-full">
+          {isMobile ? (
+            /* Mobile View: Render only the active single column */
+            <div className="w-full h-full flex flex-1 overflow-hidden">
+              {mobileView === 'sidebar' && (
+                <InboxSidebar 
+                  chats={chats} 
+                  selectedChatId={selectedChatId} 
+                  isMobile={true}
+                  onBack={() => setMobileView('list')}
+                />
+              )}
+              {mobileView === 'list' && (
+                <ConversationList
+                  chats={chats}
+                  selectedChatId={selectedChatId}
+                  onSelectChat={handleSelectChat}
+                  isSidebarOpen={true}
+                  onToggleSidebar={handleToggleSidebar}
+                />
+              )}
+              {mobileView === 'chat' && (
+                <ChatThread
+                  chat={selectedChat}
+                  onSendMessage={handleSendMessage}
+                  isDetailsOpen={false}
+                  onToggleDetails={() => setMobileView('details')}
+                  isMobile={true}
+                  onBack={() => setMobileView('list')}
+                />
+              )}
+              {mobileView === 'details' && (
+                <DetailsPanel
+                  chat={selectedChat}
+                  onClose={() => setMobileView('chat')}
+                  onAddLabel={handleAddLabel}
+                  onSaveNotes={handleSaveNotes}
+                />
+              )}
+            </div>
+          ) : (
+            /* Desktop View: Render normal multi-column layout */
+            <>
+              {/* Column A */}
+              {isSidebarOpen && renderColumn(1, 
+                <InboxSidebar chats={chats} selectedChatId={selectedChatId} />
+              )}
 
-          {/* Column B */}
-          {renderColumn(2, 
-            <ConversationList
-              chats={chats}
-              selectedChatId={selectedChatId}
-              onSelectChat={setSelectedChatId}
-              isSidebarOpen={isSidebarOpen}
-              onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-            />
-          )}
+              {/* Column B */}
+              {renderColumn(2, 
+                <ConversationList
+                  chats={chats}
+                  selectedChatId={selectedChatId}
+                  onSelectChat={handleSelectChat}
+                  isSidebarOpen={isSidebarOpen}
+                  onToggleSidebar={handleToggleSidebar}
+                />
+              )}
 
-          {/* Column C */}
-          {renderColumn(3, 
-            <ChatThread
-              chat={selectedChat}
-              onSendMessage={handleSendMessage}
-              isDetailsOpen={isDetailsOpen}
-              onToggleDetails={() => setIsDetailsOpen(!isDetailsOpen)}
-            />
-          )}
+              {/* Column C */}
+              {renderColumn(3, 
+                <ChatThread
+                  chat={selectedChat}
+                  onSendMessage={handleSendMessage}
+                  isDetailsOpen={isDetailsOpen}
+                  onToggleDetails={() => setIsDetailsOpen(!isDetailsOpen)}
+                />
+              )}
 
-          {/* Column D */}
-          {isDetailsOpen && renderColumn(4, 
-            <DetailsPanel
-              chat={selectedChat}
-              onClose={() => setIsDetailsOpen(false)}
-              onAddLabel={handleAddLabel}
-              onSaveNotes={handleSaveNotes}
-            />
+              {/* Column D */}
+              {isDetailsOpen && renderColumn(4, 
+                <DetailsPanel
+                  chat={selectedChat}
+                  onClose={() => setIsDetailsOpen(false)}
+                  onAddLabel={handleAddLabel}
+                  onSaveNotes={handleSaveNotes}
+                />
+              )}
+            </>
           )}
         </div>
       </div>

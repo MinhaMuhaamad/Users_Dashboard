@@ -20,7 +20,7 @@ export function MessageBubble({ message, index }: MessageBubbleProps) {
       <div
         className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
           message.isOwn
-            ? 'bg-blue-100 text-blue-900'
+            ? 'bg-violet-100 text-violet-900'
             : 'bg-gray-100 text-gray-900'
         }`}
       >

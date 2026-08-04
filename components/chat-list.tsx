@@ -20,10 +20,11 @@ export function ChatList({ chats, selectedChatId, onSelectChat }: ChatListProps)
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.4 }}
-      className="w-80 bg-white border-r border-gray-200 flex flex-col"
+      className="w-72 bg-white border-r border-gray-200 flex flex-col h-full shrink-0"
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
+        <h2 className="text-sm font-semibold text-gray-900 mb-3">Michael Johnson</h2>
         <div className="relative mb-3">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input

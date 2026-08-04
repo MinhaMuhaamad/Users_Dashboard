@@ -44,7 +44,6 @@ export function ChatWindow({ chat }: ChatWindowProps) {
           <Avatar initials={chat.user.initials} name={chat.user.name} size="md" />
           <div>
             <h2 className="font-semibold text-gray-900">{chat.user.name}</h2>
-            <p className="text-xs text-gray-500">28 August 2025</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -62,6 +61,11 @@ export function ChatWindow({ chat }: ChatWindowProps) {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-2">
+        <div className="flex justify-center mb-4">
+          <span className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+            28 August 2025
+          </span>
+        </div>
         {chat.messages.map((message, idx) => (
           <MessageBubble key={message.id} message={message} index={idx} />
         ))}

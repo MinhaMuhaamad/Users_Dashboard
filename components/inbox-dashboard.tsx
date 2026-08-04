@@ -1,54 +1,49 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Sidebar } from './sidebar'
-import { ChatList } from './chat-list'
-import { ChatWindow } from './chat-window'
-import { DetailsPanel } from './details-panel'
+import { motion, AnimatePresence } from 'framer-motion'
+import { DashboardContent } from './dashboard-content'
 import { LoadingOverlay } from './loading-overlay'
-import { currentUserData } from '@/lib/mock-data'
 import { useChatsWithApi } from '@/hooks/useChatsWithApi'
 
 export function InboxDashboard() {
-  const { chats, isLoading, hasLoaded } = useChatsWithApi()
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
+  const { chats, isLoading } = useChatsWithApi()
+  const [selectedChatId, setSelectedChatId] = useState<string | null>('1')
+  const [isExpanded, setIsExpanded] = useState(false)
 
-  // Set default selected chat once data loads
   useEffect(() => {
-    if (hasLoaded && !selectedChatId && chats.length > 0) {
+    if (!selectedChatId && chats.length > 0) {
       setSelectedChatId(chats[0]?.id || null)
     }
-  }, [hasLoaded, chats, selectedChatId])
-
-  const selectedChat = chats.find((chat) => chat.id === selectedChatId) || null
+  }, [chats, selectedChatId])
 
   return (
     <>
-      <LoadingOverlay isVisible={isLoading} />
+      <AnimatePresence>
+        {!isExpanded && (
+          <LoadingOverlay
+            isVisible
+            isLoading={isLoading}
+            chats={chats}
+            selectedChatId={selectedChatId}
+            onExpand={() => setIsExpanded(true)}
+          />
+        )}
+      </AnimatePresence>
 
-      {!isLoading && (
+      {isExpanded && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="flex h-screen w-full bg-white overflow-hidden"
+          initial={{ opacity: 0, y: '40vh', scale: 0.85 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="fixed inset-0 z-50 bg-white"
         >
-          {/* Sidebar */}
-          <Sidebar currentUser={currentUserData} />
-
-          {/* Chat List */}
-          <ChatList
+          <DashboardContent
             chats={chats}
             selectedChatId={selectedChatId}
             onSelectChat={setSelectedChatId}
+            interactive
           />
-
-          {/* Chat Window */}
-          <ChatWindow chat={selectedChat} />
-
-          {/* Details Panel */}
-          <DetailsPanel chat={selectedChat} />
         </motion.div>
       )}
     </>

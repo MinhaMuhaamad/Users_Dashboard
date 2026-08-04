@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { MoreVertical, Moon, Copy, Bold, Italic, Link, Smile, Paperclip, Send } from 'lucide-react'
+import { MoreVertical, Moon, PanelRight, Image, PlaySquare, FileText, Smile, CornerDownLeft, Sparkles, Mic } from 'lucide-react'
 import { Avatar } from './avatar'
 import { MessageBubble } from './message-bubble'
 import { Chat } from '@/types'
@@ -54,7 +54,7 @@ export function ChatWindow({ chat }: ChatWindowProps) {
             <Moon size={20} className="text-gray-600" />
           </button>
           <button className="p-1.5 hover:bg-gray-100 rounded transition">
-            <Copy size={20} className="text-gray-600" />
+            <PanelRight size={20} className="text-gray-600" />
           </button>
         </div>
       </div>
@@ -73,40 +73,49 @@ export function ChatWindow({ chat }: ChatWindowProps) {
       </div>
 
       {/* Message Input */}
-      <div className="p-4 border-t border-gray-200">
-        {/* Formatting Toolbar */}
-        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-200">
-          <button className="p-1.5 hover:bg-gray-100 rounded transition">
-            <Bold size={16} className="text-gray-600" />
-          </button>
-          <button className="p-1.5 hover:bg-gray-100 rounded transition">
-            <Italic size={16} className="text-gray-600" />
-          </button>
-          <button className="p-1.5 hover:bg-gray-100 rounded transition">
-            <Link size={16} className="text-gray-600" />
-          </button>
-          <button className="p-1.5 hover:bg-gray-100 rounded transition">
-            <Smile size={16} className="text-gray-600" />
-          </button>
-        </div>
+      <div className="p-4 border-t border-gray-200 bg-white">
+        <div className="border border-gray-200 rounded-xl p-3 shadow-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition bg-[#fafafa]">
+          {/* Input text field */}
+          <textarea
+            rows={1}
+            placeholder="Type something...."
+            value={messageInput}
+            onChange={(e) => setMessageInput(e.target.value)}
+            className="w-full bg-transparent border-0 p-0 text-sm focus:ring-0 focus:outline-none placeholder-gray-400 text-gray-800 resize-none min-h-[40px] max-h-[120px]"
+            style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+          />
 
-        {/* Input Field */}
-        <div className="flex items-end gap-2">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Type something...."
-              value={messageInput}
-              onChange={(e) => setMessageInput(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          {/* Toolbar at the bottom */}
+          <div className="flex items-center justify-between border-t border-gray-150 pt-2.5 mt-2">
+            {/* Left toolbar icons */}
+            <div className="flex items-center gap-1">
+              <button className="p-1.5 hover:bg-gray-200/60 rounded text-gray-500 hover:text-gray-700 transition">
+                <Image size={18} />
+              </button>
+              <button className="p-1.5 hover:bg-gray-200/60 rounded text-gray-500 hover:text-gray-700 transition">
+                <PlaySquare size={18} />
+              </button>
+              <button className="p-1.5 hover:bg-gray-200/60 rounded text-gray-500 hover:text-gray-700 transition">
+                <FileText size={18} />
+              </button>
+              <button className="p-1.5 hover:bg-gray-200/60 rounded text-gray-500 hover:text-gray-700 transition">
+                <Smile size={18} />
+              </button>
+              <button className="p-1.5 hover:bg-gray-200/60 rounded text-gray-500 hover:text-gray-700 transition">
+                <CornerDownLeft size={18} />
+              </button>
+            </div>
+
+            {/* Right toolbar icons */}
+            <div className="flex items-center gap-1.5">
+              <button className="p-1.5 hover:bg-gray-200/60 rounded text-gray-500 hover:text-gray-700 transition">
+                <Sparkles size={18} className="text-gray-600" />
+              </button>
+              <button className="p-1.5 hover:bg-gray-200/60 rounded text-gray-500 hover:text-gray-700 transition font-bold">
+                <Mic size={18} />
+              </button>
+            </div>
           </div>
-          <button className="p-2 hover:bg-gray-100 rounded transition">
-            <Paperclip size={20} className="text-gray-600" />
-          </button>
-          <button className="p-2 hover:bg-gray-100 rounded transition">
-            <Send size={20} className="text-gray-600" />
-          </button>
         </div>
       </div>
     </motion.div>

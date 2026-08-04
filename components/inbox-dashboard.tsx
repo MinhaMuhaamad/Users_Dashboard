@@ -7,7 +7,7 @@ import { LoadingOverlay } from './loading-overlay'
 import { useChatsWithApi } from '@/hooks/useChatsWithApi'
 
 export function InboxDashboard() {
-  const { chats } = useChatsWithApi()
+  const { chats, isLoading } = useChatsWithApi()
   const [selectedChatId, setSelectedChatId] = useState<string | null>('1')
   const [isExpanded, setIsExpanded] = useState(false)
   const [expandProgress, setExpandProgress] = useState(0)
@@ -80,6 +80,7 @@ export function InboxDashboard() {
             selectedChatId={selectedChatId}
             expandProgress={expandProgress}
             onExpand={handleExpand}
+            isLoading={isLoading}
           />
         )}
       </AnimatePresence>

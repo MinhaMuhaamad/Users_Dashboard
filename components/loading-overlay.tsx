@@ -13,7 +13,7 @@ import {
 import { CircularBgGlow } from './circular-bg-glow'
 import { HexagonIcon } from './hexagon-icon'
 import { ExtractionRing } from './extraction-ring'
-import { ScaledDashboardPreview, DashboardSkeleton } from './scaled-dashboard-preview'
+import { ScaledDashboardPreview, ScaledDashboardSkeleton } from './scaled-dashboard-preview'
 import { Chat } from '@/types'
 
 const WHITE_PANEL_BASE_HEIGHT = 42 // vh — keep exactly the same
@@ -24,6 +24,7 @@ interface LoadingOverlayProps {
   selectedChatId: string | null
   expandProgress: number
   onExpand: () => void
+  isLoading?: boolean
 }
 
 export function LoadingOverlay({
@@ -32,11 +33,28 @@ export function LoadingOverlay({
   selectedChatId,
   expandProgress,
   onExpand,
+  isLoading = true,
 }: LoadingOverlayProps) {
   if (!isVisible) return null
 
+  const [stage, setStage] = React.useState<'hidden' | 'skeleton' | 'data'>('hidden')
+
+  React.useEffect(() => {
+    if (isLoading) {
+      setStage('hidden')
+    } else {
+      if (stage === 'hidden') {
+        setStage('skeleton')
+        const timer = setTimeout(() => {
+          setStage('data')
+        }, 1500)
+        return () => clearTimeout(timer)
+      }
+    }
+  }, [isLoading, stage])
+
   const panelHeight = WHITE_PANEL_BASE_HEIGHT + expandProgress * (100 - WHITE_PANEL_BASE_HEIGHT)
-  const showDashboard = chats.length > 0 && selectedChatId
+  const marginDynamic = stage === 'hidden' ? '0vh' : `${panelHeight}vh`
 
   return (
     <motion.div
@@ -63,8 +81,8 @@ export function LoadingOverlay({
 
       {/* Central extraction content */}
       <div
-        className="relative z-10 flex flex-col items-center gap-5 transition-all duration-300"
-        style={{ marginBottom: `${panelHeight}vh`, paddingBottom: '2rem' }}
+        className="relative z-10 flex flex-col items-center gap-5 transition-all duration-700 ease-in-out"
+        style={{ marginBottom: marginDynamic, paddingBottom: '2rem' }}
       >
         <ExtractionRing />
 
@@ -84,7 +102,7 @@ export function LoadingOverlay({
           We are extracting information from the above honey combs to your system
         </motion.p>
 
-        {expandProgress < 0.05 && (
+        {expandProgress < 0.05 && stage === 'data' && (
           <motion.p
             animate={{ opacity: [0.4, 0.8, 0.4] }}
             transition={{ duration: 2, repeat: Infinity }}
@@ -97,16 +115,20 @@ export function LoadingOverlay({
 
       {/* Bottom white panel — fixed size base, grows on scroll */}
       <motion.div
-        initial={{ opacity: 0, y: 60 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, duration: 0.7, ease: 'easeOut' }}
-        onClick={onExpand}
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[96%] max-w-6xl bg-white rounded-t-2xl shadow-[0_-12px_48px_rgba(0,0,0,0.3)] overflow-hidden cursor-pointer group"
+        initial={{ y: '100%', opacity: 0, x: '-50%' }}
+        animate={{
+          y: stage === 'hidden' ? '100%' : 0,
+          opacity: stage === 'hidden' ? 0 : 1,
+          x: '-50%'
+        }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        onClick={stage === 'data' ? onExpand : undefined}
+        className="absolute bottom-0 left-1/2 w-[96%] max-w-6xl bg-white rounded-t-2xl shadow-[0_-12px_48px_rgba(0,0,0,0.3)] overflow-hidden cursor-pointer group"
         style={{ height: `${panelHeight}vh` }}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') onExpand()
+          if (stage === 'data' && (e.key === 'Enter' || e.key === ' ')) onExpand()
         }}
         aria-label="Click or scroll to open full dashboard"
       >
@@ -121,10 +143,10 @@ export function LoadingOverlay({
         )}
 
         <div className="h-full w-full overflow-hidden">
-          {showDashboard ? (
+          {stage === 'data' && chats.length > 0 && selectedChatId ? (
             <ScaledDashboardPreview chats={chats} selectedChatId={selectedChatId} />
           ) : (
-            <DashboardSkeleton />
+            <ScaledDashboardSkeleton />
           )}
         </div>
       </motion.div>

@@ -161,3 +161,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom scrollbar styling for webkit browsers */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e2e8f0; /* light grey */
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1; /* slightly darker on hover */
+}

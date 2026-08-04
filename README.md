@@ -45,33 +45,7 @@ lib/
   loadingConfig.ts         // Central timing constants for animation transitions
 ```
 
----
 
-## Loading State Machine Flow
-
-The application implements a custom state machine driving the dashboard load sequence:
-
-```
-[Selecting] ──(selectionDelay: 200ms)──> [Loading (Overlay - Fetching)]
-                                                    │
-                                            (API data resolves)
-                                                    ▼
-[Skeleton] <──(user scroll down / clicks drawer)── [Loaded (Overlay - Populated Preview)]
-    │
-(skeletonDelay: 800ms)
-    ▼
-[Flying (Hexagon transition)] ──(flyDuration: 650ms)──> [Populating (Staggered column fade-in)] ──> [Ready (CRM)]
-```
-
-1. **Selecting (`selecting`)**: Clicking a nav tab prompts a brief hover transition (200ms).
-2. **Loading (`loading`)**: Overlay showing conic ring, floating hexagons, status text, and bottom skeleton drawer preview during API fetch.
-3. **Loaded (`loaded`)**: Conic ring stabilizes, and the bottom drawer updates to render the **actual populated dashboard preview** with real data. The overlay stays active in this state.
-4. **Skeleton (`skeleton`)**: Triggered when the user scrolls down or clicks the peeking drawer. The overlay fades out, showing full-screen dashboard skeleton placeholders (800ms).
-5. **Flying (`flying`)**: Selected tab icon translates, scales down, and fades into the sidebar header (650ms).
-6. **Populating (`populating`)**: Columns fade/slide in sequentially (100ms stagger intervals).
-7. **Ready (`ready`)**: Full interactive workspace is loaded.
-
----
 
 ## Mandatory API Integration
 
